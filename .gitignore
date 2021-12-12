@@ -1,1 +1,3 @@
 .pio
+lib/Teensy-reSID/examples/
+lib/Teensy-reSID/extras/
