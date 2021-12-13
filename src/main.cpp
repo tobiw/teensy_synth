@@ -15,6 +15,8 @@ AudioControlSGTL5000 sgtl5000_1;
 USBHost usb_host;
 MIDIDevice usb_midi(usb_host);
 
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
+
 MultiVoices *voices;
 Display display;
 
@@ -22,6 +24,8 @@ struct midi_info_display_t midi_info_display;
 
 void setup() {
   delay(3000);
+
+  MIDI.begin(MIDI_CHANNEL_OMNI);
 
   memset(&midi_info_display, 0, sizeof (midi_info_display));
 
@@ -47,6 +51,26 @@ void setup() {
   Serial.println("initialization done.");
 }
 
+void handleHardwareMidiInput()
+{
+    const byte type = MIDI.getType();
+
+    switch (type)
+    {
+    case midi::ControlChange:
+        Serial.print("MIDI CC ");
+        Serial.print(" ");
+        Serial.print(MIDI.getData1());
+        Serial.print(" ");
+        Serial.print(MIDI.getData2());
+        Serial.println("");
+        handleMidiControlChange(MIDI.getChannel(), MIDI.getData1(), MIDI.getData2());
+        break;
+    default:
+        Serial.println("Unhandled Hardware MIDI input");
+        break;
+    }
+}
 
 void loop() {
     static unsigned long last_arp_update = 0;
@@ -55,7 +79,11 @@ void loop() {
     usb_host.Task();
     usb_midi.read(0);
 
-    static unsigned long m = millis();
+    if (MIDI.read())
+    {
+        handleHardwareMidiInput();
+    }
+
     m = millis();
 
     if ((m - last_arp_update) > voices->arp_interval) // TODO: make interval configurable

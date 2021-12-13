@@ -72,6 +72,11 @@ void handleMidiControlChange(byte channel, byte control, byte value)
         Serial.print("Set release ");
         Serial.println(env0release);
         break;
+    case 25:
+        voices->arp_enabled = !voices->arp_enabled;
+        Serial.print("Arpegiator ");
+        Serial.println(voices->arp_enabled);
+        break;
     }
 }
 
