@@ -21,6 +21,7 @@ public:
     void setPwm(int pwm);
 
     bool arp_enabled;
+    uint16_t arp_interval;
 
 protected:
     bool voiceActive[NUM_VOICES];

@@ -50,6 +50,7 @@ void setup() {
 
 void loop() {
     static unsigned long last_arp_update = 0;
+    static unsigned long m = millis();
 
     usb_host.Task();
     usb_midi.read(0);
@@ -57,7 +58,7 @@ void loop() {
     static unsigned long m = millis();
     m = millis();
 
-    if ((m - last_arp_update) > 50) // TODO: make interval configurable
+    if ((m - last_arp_update) > voices->arp_interval) // TODO: make interval configurable
     {
         voices->updateArpegiator();
         last_arp_update = m;

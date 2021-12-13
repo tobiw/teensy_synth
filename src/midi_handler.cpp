@@ -46,10 +46,13 @@ void handleMidiControlChange(byte channel, byte control, byte value)
         Serial.print("Arpegiator ");
         Serial.println(voices->arp_enabled);
     case 5:
-        env0attack = value;
+        //env0attack = value;
         //sid_synth->setADEnvelope(0, env0attack, env0decay);
-        Serial.print("Set attack ");
-        Serial.println(env0attack);
+        if (value < 5) value = 0; // limit minimum arp interval to 5*2=10 ms
+        voices->arp_interval = value << 1;
+        voices->arp_enabled = voices->arp_interval > 0;
+        Serial.print("Set arp interval ");
+        Serial.println(voices->arp_interval);
         break;
     case 6:
         env0decay = value;

@@ -22,6 +22,7 @@ AudioConnection patchCord12(mixer[2], 0, i2s, 1);
 MultiVoices::MultiVoices()
 {
     arp_enabled = false;
+    arp_interval = 50;
     current_note = 1;
 
     memset(voiceActive, 0, sizeof (bool) * NUM_VOICES);
