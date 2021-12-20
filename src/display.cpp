@@ -1,4 +1,5 @@
 #include "display.h"
+//#include "menu.h"
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -19,17 +20,20 @@ void Display::begin()
     }
 
     ssd1306->clearDisplay();
-    ssd1306->setTextSize(1);
-    ssd1306->setTextColor(WHITE);
-    ssd1306->setCursor(0, 0);
-    ssd1306->write("Hello World");
     ssd1306->display();
-
 }
 
 void Display::update(unsigned long m)
 {
     static char display_buf[16];
+
+    // Show current menu
+    ssd1306->clearDisplay();
+    ssd1306->setCursor(0, 0);
+    //menu->draw(ssd1306);
+    ssd1306->display();
+
+    return;
 
     // If there is no update pending or interval from last update is too short, skip updating the display
     if (!midi_info_display.updated || (m - midi_info_display.last_updated) < 100) {

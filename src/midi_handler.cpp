@@ -1,8 +1,10 @@
 #include "midi_handler.h"
 #include "mos.h"
 #include "multivoices.h"
+#include "menu.h"
 
 extern struct midi_info_display_t midi_info_display;
+extern Menu *menu;
 
 // TODO: handle MultiVoices? (sets all voices to the same parameters)
 int env0attack, env0decay, env0sustain, env0release;
@@ -10,6 +12,11 @@ int filter0freq, filter0resonance;
 
 class MultiVoices;
 extern MultiVoices *voices;
+
+#define CC_VOICE1_WAVE 17
+#define CC_VOICE1_ATTACK 16
+#define CC_VOICE1_DECAY 15
+#define CC_VOICE1_SUSTAIN 14
 
 void handleMidiControlChange(byte channel, byte control, byte value)
 {
@@ -20,6 +27,11 @@ void handleMidiControlChange(byte channel, byte control, byte value)
         midi_info_display.last_updated = millis();
         midi_info_display.updated = true;
     }
+
+    Serial.print("CC ");
+    Serial.print(control);
+    Serial.print(" ");
+    Serial.println(value);
 
     switch (control) {
     case 1:
@@ -72,7 +84,17 @@ void handleMidiControlChange(byte channel, byte control, byte value)
         Serial.print("Set release ");
         Serial.println(env0release);
         break;
-    case 25:
+    case 9: // encoder
+        if (value == 64) {
+            menu->rotate_left();
+        } else if (value == 127) {
+            menu->rotate_right();
+        }
+        break;
+    case 18: // encoder button
+        if (value == 127) menu->select();
+        break;
+    case 10: // red button
         voices->arp_enabled = !voices->arp_enabled;
         Serial.print("Arpegiator ");
         Serial.println(voices->arp_enabled);

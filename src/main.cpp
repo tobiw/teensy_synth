@@ -9,6 +9,7 @@
 #include "midi_handler.h"
 #include "multivoices.h"
 #include "display.h"
+#include "menu.h"
 
 AudioControlSGTL5000 sgtl5000_1;
 
@@ -18,6 +19,7 @@ MIDIDevice usb_midi(usb_host);
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 MultiVoices *voices;
+Menu *menu;
 Display display;
 
 struct midi_info_display_t midi_info_display;
@@ -29,6 +31,7 @@ void setup() {
 
   memset(&midi_info_display, 0, sizeof (midi_info_display));
 
+  menu = new Menu;
   display.begin();
 
   AudioMemory(10);
@@ -92,5 +95,6 @@ void loop() {
         last_arp_update = m;
     }
 
-    display.update(m);
+    menu->draw(display.get_ssd1306());
+    //display.update(m);
 }

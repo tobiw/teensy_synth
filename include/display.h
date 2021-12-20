@@ -4,6 +4,7 @@
 #include "midi_handler.h"
 
 class Adafruit_SSD1306;
+class Menu;
 
 class Display
 {
@@ -12,6 +13,7 @@ class Display
 
 public:
     Display();
+    Adafruit_SSD1306 *get_ssd1306() { return ssd1306; }
     void begin();
     void update(unsigned long m);
 };
