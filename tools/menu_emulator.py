@@ -41,8 +41,9 @@ class Menu:
 
 
 class PageParams:
-    def __init__(self, params, limits, repr_map=None):
+    def __init__(self, param_names, params, limits, repr_map=None):
         # Need to copy lists and dicts as passed in arguments might be references to the same list/dict (e.g. multiple oscillators)
+        self._param_names = param_names[:]
         self._params = params[:]  # must be list of parameter names
         self._param_limits = limits[:]  # must be list of tuples of (min, max) limits
         self._param_representations = None if repr_map is None else repr_map.copy()  # must be list of dictionaries mapping value to str, or None for direct integer display
@@ -59,10 +60,12 @@ class PageParams:
         self._params[self.active_param] = max(self._param_limits[self.active_param][0], self._params[self.active_param] - 1)
 
     def get_str(self, i):
+        s = self._param_names[i] + ': '
         if self._param_representations is None or self._param_representations[i] is None:
-            return str(self._params[i])
+            s += str(self._params[i])
         else:
-            return self._param_representations[i][self._params[i]]
+            s += self._param_representations[i][self._params[i]]
+        return s
 
 
 class MenuPage:
@@ -104,15 +107,17 @@ class MenuPage:
         staticwin.box()
         staticwin.refresh()
 
-osc_list_init_values = [0, 0, 440, 0, 0]  # dis/en, waveform, frequency, sync, ringmod
+osc_list_param_names = ['Status', 'Waveform', 'Frequency', 'Sync', 'Ring']
+osc_list_init_values = [0, 0, 440, 0, 0]
 osc_list_limits = [(0, 1), (0, 3), (100, 500), (0, 1), (0, 1)]
 osc_list_repr_map = [{0: 'dis', 1: 'en'}, {0: 'SIN', 1: 'TRI', 2: 'SQU', 3: 'NSE'}, None, {0: 'No sync', 1: 'sync'}, {0: 'no ringmod', 1: 'ringmod'}]
 
 pages = [
-    MenuPage('Filter', PageParams([1000, 1], [(100, 10000), (0, 10)], None)),
-    MenuPage('Osc 1', PageParams(osc_list_init_values, osc_list_limits, osc_list_repr_map)),
-    MenuPage('Osc 2', PageParams(osc_list_init_values, osc_list_limits, osc_list_repr_map)),
-    MenuPage('Osc 3', PageParams(osc_list_init_values, osc_list_limits, osc_list_repr_map)),
+    MenuPage('Osc 1', PageParams(osc_list_param_names, osc_list_init_values, osc_list_limits, osc_list_repr_map)),
+    MenuPage('Osc 2', PageParams(osc_list_param_names, osc_list_init_values, osc_list_limits, osc_list_repr_map)),
+    MenuPage('Osc 3', PageParams(osc_list_param_names, osc_list_init_values, osc_list_limits, osc_list_repr_map)),
+    MenuPage('Filter', PageParams(['Type', 'Cutoff freq', 'Resonance'], [1, 1000, 1], [(0, 4), (100, 10000), (0, 10)], [{0: 'off', 1: 'LP', 2: 'BP', 3: 'HP', 4: '3off'}, None, None])),
+    MenuPage('Arpegiator', PageParams(['Status', 'Mode'], [0, 0], [(0, 1), (0, 3)], [{0: 'dis', 1: 'en'}, {0: 'up', 1: 'down', 2: 'pingpong', 3: 'random'}])),
 ]
 menu = Menu(pages)
 
